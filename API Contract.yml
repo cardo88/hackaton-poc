@@ -1,0 +1,69 @@
+openapi: 3.0.0
+info:
+  title: Parade Weather API
+  version: 0.1.0
+paths:
+  /health:
+    get:
+      responses:
+        '200': { description: OK }
+  /query:
+    post:
+      summary: Probabilidad de condiciones adversas para una ubicación y fecha
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [lat, lon, date_iso, profile]
+              properties:
+                lat: { type: number }
+                lon: { type: number }
+                date_iso: { type: string, format: date }
+                profile:
+                  type: string
+                  enum: [default, family, trail_runner, fishing, photographer, cycling]
+                sensitivity:
+                  type: object
+                  description: overrides opcionales [0..1]
+                  properties:
+                    heat: { type: number }
+                    cold: { type: number }
+                    wind: { type: number }
+                    wet: { type: number }
+                    discomfort: { type: number }
+      responses:
+        '200':
+          description: Resultado con probabilidades y explicabilidad
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  location: { type: object }
+                  when: { type: object }
+                  probabilities:
+                    type: object
+                    properties:
+                      very_hot: { type: number }
+                      very_cold: { type: number }
+                      very_windy: { type: number }
+                      very_wet: { type: number }
+                      very_uncomfortable: { type: number }
+                  top_risks:
+                    type: array
+                    items: { type: string }
+                  drivers:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        label: { type: string }
+                        value: { type: number }
+                        unit: { type: string }
+                        contribution: { type: number }
+                  confidence: { type: string, enum: [low, medium, high] }
+                  suggestions:
+                    type: array
+                    items: { type: string }
